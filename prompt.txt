@@ -1,0 +1,12 @@
+python main_test_swinir.py --task classical_sr --scale 8 --training_patch_size 48 --model_path model_zoo/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x8.pth --folder_lq input --folder_gt input
+
+
+
+dopo aver inserito l'immagine all'interno della cartella input, spostarla in quella corretta per avviare il codice. 
+
+- inserire il video in input folder 
+- chiedere il tipo di video che si vuole restaurare 
+- spostarlo nella cartella corretta
+- effettuare operazioni
+
+https://github.com/JingyunLiang/SwinIR?tab=readme-ov-file link github
