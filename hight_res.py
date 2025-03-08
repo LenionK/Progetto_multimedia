@@ -87,6 +87,7 @@ def hight_res(label):
     for idx, path in enumerate(sorted(glob.glob(os.path.join(folder, '*')))):
         # read image
         imgname = os.path.basename(path)
+        print(f"Sto elaborando frame [{imgname}]")
         label.setText(f"Sto elaborando frame [{imgname}]")
 
         img_lq = cv2.imread(f'{folder}/{imgname}', cv2.IMREAD_COLOR).astype(np.float32) / 255.
