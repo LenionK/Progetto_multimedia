@@ -43,7 +43,7 @@ def test(img_lq, model, tile ,window_size):
     return output
 
 
-def hight_res(label): 
+def hight_res(label,folder_frames, save_dir ): 
 
     model_path = "model_zoo/swinir/001_classicalSR_DIV2K_s48w8_SwinIR-M_x8.pth"
     scale = 8
@@ -76,25 +76,24 @@ def hight_res(label):
 
     #----- set_up ------ 
 
-    save_dir = f'results/swinir_x{scale}'
-    folder = './frames/'
+    #save_dir = f'results/swinir_x{scale}'
+    #folder = './frames/'
     border = scale
     window_size = 8
 
     os.makedirs(save_dir, exist_ok=True)
+    iteration(label, folder_frames , device, window_size, scale, model, save_dir)
 
-    iteration(label, folder, device, window_size, scale, model, save_dir)
 
+def iteration(label, folder_frames, device, window_size, scale, model, save_dir):
 
-def iteration(label, folder, device, window_size, scale, model, save_dir):
-
-    for idx, path in enumerate(sorted(glob.glob(os.path.join(folder, '*')))):
+    for idx, path in enumerate(sorted(glob.glob(os.path.join(folder_frames, '*')))):
         # read image
         imgname = os.path.basename(path)
         print(f"Sto elaborando frame [{imgname}]")
         label.setText(f"Sto elaborando frame [{imgname}]")
 
-        img_lq = cv2.imread(f'{folder}/{imgname}', cv2.IMREAD_COLOR).astype(np.float32) / 255.
+        img_lq = cv2.imread(f'{folder_frames}/{imgname}', cv2.IMREAD_COLOR).astype(np.float32) / 255.
 
 
         img_lq = np.transpose(img_lq if img_lq.shape[2] == 1 else img_lq[:, :, [2, 1, 0]], (2, 0, 1))  # HCW-BGR to CHW-RGB
@@ -118,17 +117,10 @@ def iteration(label, folder, device, window_size, scale, model, save_dir):
         output = (output * 255.0).round().astype(np.uint8)  # float32 to uint8
         cv2.imwrite(f'{save_dir}/{imgname}_SwinIR.png', output)
 
-def reconstruct_video_from_frames(frame_dir, save_dir, video_name="output_video.mp4", frame_rate=30):
-    """
-    Reconstructs a video from a sequence of frames.
 
-    Parameters:
-    - frame_dir (str): Directory where the frames are stored.
-    - save_dir (str): Directory where the output video will be saved.
-    - video_name (str): Name of the output video file (default is "output_video.mp4").
-    - frame_rate (int): The frame rate of the output video (default is 30 fps).
-    """
-    # Get all the frame files in sorted order
+
+def reconstruct_video_from_frames(frame_dir, save_dir="results/video", video_name="output_video.mp4", frame_rate=30):
+
     frames = sorted(glob.glob(os.path.join(frame_dir, '*_SwinIR.png')))
 
     if not frames:
