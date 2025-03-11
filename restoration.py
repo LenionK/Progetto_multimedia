@@ -144,3 +144,62 @@ def reconstruct_video_from_frames(frame_dir, save_dir="results/video", video_nam
     out_video.release()
 
     print(f"Video saved as {video_name} in {save_dir}")
+
+def detect_image_type(image_path):
+    image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
+    
+    if len(image.shape) == 2 or image.shape[2] == 1:
+        return "gray_dn"
+    else:
+        return "color_dn"
+
+def denoise(label, folder_frames, save_dir): 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    # Prendi la prima immagine dalla cartella
+    image_files = [f for f in os.listdir(folder_frames) if f.endswith(('.png', '.jpg', '.jpeg'))]
+    if not image_files:
+        raise FileNotFoundError("Nessuna immagine trovata in {}".format(folder_frames))
+
+    first_image_path = os.path.join(folder_frames, image_files[0])
+    task = detect_image_type(first_image_path)  # Determina il tipo di immagine
+
+    # Seleziona il modello in base al tipo di immagine
+    if task == "gray_dn":
+        model_path = "model_zoo/swinir/004_grayDN_DFWB_s128w8_SwinIR-M_noise15.pth"
+    else:
+        model_path = "model_zoo/swinir/005_colorDN_DFWB_s128w8_SwinIR-M_noise15.pth"
+
+    if not os.path.exists(model_path):
+        os.makedirs(os.path.dirname(model_path), exist_ok=True)
+        url = f'https://github.com/JingyunLiang/SwinIR/releases/download/v0.0/{os.path.basename(model_path)}'
+        print(f'Downloading model {model_path}')
+        r = requests.get(url, allow_redirects=True)
+        open(model_path, 'wb').write(r.content)
+    else:
+        print(f'Loading model from {model_path}')
+
+    # Definizione del modello
+    model = net(
+        upscale=1, 
+        in_chans=1 if task == "gray_dn" else 3, 
+        img_size=128, 
+        window_size=8,
+        img_range=1., 
+        depths=[6, 6, 6, 6, 6, 6], 
+        embed_dim=180, 
+        num_heads=[6, 6, 6, 6, 6, 6],
+        mlp_ratio=2, 
+        upsampler='', 
+        resi_connection='1conv'
+    )
+
+    param_key_g = 'params'
+    pretrained_model = torch.load(model_path)
+    model.load_state_dict(pretrained_model.get(param_key_g, pretrained_model), strict=True)
+
+    model.eval()
+    model = model.to(device)
+
+    os.makedirs(save_dir, exist_ok=True)
+    iteration(label, folder_frames, device, 8, 1, model, save_dir)
