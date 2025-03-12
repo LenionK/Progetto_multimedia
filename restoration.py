@@ -84,7 +84,7 @@ def hight_res(label,folder_frames, save_dir ):
     os.makedirs(save_dir, exist_ok=True)
     iteration(label, folder_frames , device, window_size, scale, model, save_dir , "HR")
 
-    return f'{save_dir}/"HR"/'
+    return f'{save_dir}/HR'
 
 
 def iteration(label, folder_frames, device, window_size, scale, model, save_dir , prefix):
@@ -117,13 +117,20 @@ def iteration(label, folder_frames, device, window_size, scale, model, save_dir 
         if output.ndim == 3:
             output = np.transpose(output[[2, 1, 0], :, :], (1, 2, 0))  # CHW-RGB to HCW-BGR
         output = (output * 255.0).round().astype(np.uint8)  # float32 to uint8
-        cv2.imwrite(f'{save_dir}/{prefix}/{prefix}_{imgname}', output)
+
+        folder_path = f'{save_dir}/{prefix}'
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        cv2.imwrite(f'{folder_path}/{prefix}_{imgname}', output)
+
+        
 
 
 
 def reconstruct_video_from_frames(frame_dir, save_dir="results/video", video_name="output_video.mp4", frame_rate=30):
 
-    frames = sorted(glob.glob(os.path.join(frame_dir, '*_SwinIR.png')))
+    frames = sorted(glob.glob(os.path.join(frame_dir, '*.png')))
 
     if not frames:
         print(f"No frames found in {frame_dir}. Make sure the frames exist.")
@@ -206,4 +213,4 @@ def denoise(label, folder_frames, save_dir):
     os.makedirs(save_dir, exist_ok=True)
     iteration(label, folder_frames, device, 8, 1, model, save_dir , "DE")
 
-    return f'{save_dir}/"DE"/'
+    return f'{save_dir}/DE'
