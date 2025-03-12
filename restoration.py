@@ -82,10 +82,12 @@ def hight_res(label,folder_frames, save_dir ):
     window_size = 8
 
     os.makedirs(save_dir, exist_ok=True)
-    iteration(label, folder_frames , device, window_size, scale, model, save_dir)
+    iteration(label, folder_frames , device, window_size, scale, model, save_dir , "HR")
+
+    return f'{save_dir}/"HR"/'
 
 
-def iteration(label, folder_frames, device, window_size, scale, model, save_dir):
+def iteration(label, folder_frames, device, window_size, scale, model, save_dir , prefix):
 
     for idx, path in enumerate(sorted(glob.glob(os.path.join(folder_frames, '*')))):
         # read image
@@ -115,7 +117,7 @@ def iteration(label, folder_frames, device, window_size, scale, model, save_dir)
         if output.ndim == 3:
             output = np.transpose(output[[2, 1, 0], :, :], (1, 2, 0))  # CHW-RGB to HCW-BGR
         output = (output * 255.0).round().astype(np.uint8)  # float32 to uint8
-        cv2.imwrite(f'{save_dir}/{imgname}_SwinIR.png', output)
+        cv2.imwrite(f'{save_dir}/{prefix}/{prefix}_{imgname}', output)
 
 
 
@@ -202,4 +204,6 @@ def denoise(label, folder_frames, save_dir):
     model = model.to(device)
 
     os.makedirs(save_dir, exist_ok=True)
-    iteration(label, folder_frames, device, 8, 1, model, save_dir)
+    iteration(label, folder_frames, device, 8, 1, model, save_dir , "DE")
+
+    return f'{save_dir}/"DE"/'
