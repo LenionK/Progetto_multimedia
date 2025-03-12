@@ -84,7 +84,7 @@ def hight_res(label,folder_frames, save_dir ):
     os.makedirs(save_dir, exist_ok=True)
     iteration(label, folder_frames , device, window_size, scale, model, save_dir , "HR")
 
-    return f'{save_dir}/HR'
+    return f'./{save_dir}/HR'
 
 
 def iteration(label, folder_frames, device, window_size, scale, model, save_dir , prefix):
@@ -213,4 +213,4 @@ def denoise(label, folder_frames, save_dir):
     os.makedirs(save_dir, exist_ok=True)
     iteration(label, folder_frames, device, 8, 1, model, save_dir , "DE")
 
-    return f'{save_dir}/DE'
+    return f'./{save_dir}/DE'
