@@ -10,3 +10,6 @@ dopo aver inserito l'immagine all'interno della cartella input, spostarla in que
 - effettuare operazioni
 
 https://github.com/JingyunLiang/SwinIR?tab=readme-ov-file link github
+
+
+https://github.com/ai-forever/Real-ESRGAN git realesr
