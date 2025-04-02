@@ -57,7 +57,7 @@ def output_img(video_paths , frames  = [1, 180, 213, 246, 380]):
         grid_image = cv2.vconcat(row_images)  # Concatena le righe per creare la griglia finale
         
         # Creare la figura
-        fig, ax = plt.subplots(figsize=(20, 20))
+        fig, ax = plt.subplots(figsize=(25, 25))
         ax.imshow(grid_image)
         ax.axis("off")  # Rimuove gli assi
         
@@ -68,5 +68,6 @@ def output_img(video_paths , frames  = [1, 180, 213, 246, 380]):
                 if j == 0:  # Etichetta centrata solo sulla prima immagine della colonna
                     x_position = (i + 0.5) * (grid_image.shape[1] / len(labels))  # Posizione orizzontale
                     ax.text(x_position, -50, label, fontsize=15, fontweight='bold', ha='center', va='bottom', color='black')
-        
+
+        plt.savefig("grid.png", bbox_inches='tight')
         plt.show()
